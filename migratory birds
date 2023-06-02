@@ -1,0 +1,7 @@
+from collections import Counter
+
+def migratory_birds(arr):
+    x = Counter(arr)
+    li = [k for k, v in x.items() if v == max(x.values())]
+
+    return min(li)
