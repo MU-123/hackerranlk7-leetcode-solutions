@@ -1,0 +1,56 @@
+import java.io.*;
+import java.math.*;
+import java.security.*;
+import java.text.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    private static long minimumWeight(long n, long m, long s) {
+        if (m <= (n - 1)*(n - 2)/2 + 1) {
+            return m + s - n + 1;
+        } else {
+            long core = (n - 1)*(n - 2)/2;
+            long unbalanced = core + (s - n + 2)*(m - core);
+            
+            long base = s/(n - 1);
+            long larger = s - base*(n - 1);
+            long smaller = n - 1 - larger;
+
+            long midbalanced = base*core + (base + larger)*(m - core);
+            
+            long balanced;
+            if (larger > 0) {
+                core = smaller*(smaller + 1)/2;
+                balanced = base*core + (base + 1)*(m - core);
+            } else {
+                balanced = base*m;
+            }
+            
+            return Math.min(Math.min(unbalanced, balanced), midbalanced);
+        }
+    }
+
+    private static final Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        int g = scanner.nextInt();
+        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])?");
+
+        for (int gItr = 0; gItr < g; gItr++) {
+            String[] nms = scanner.nextLine().split(" ");
+
+            int n = Integer.parseInt(nms[0]);
+
+            long m = Long.parseLong(nms[1]);
+
+            long s = Long.parseLong(nms[2]);
+
+            System.out.println(String.format("%d", minimumWeight(n, m, s)));
+        }
+
+        scanner.close();
+    }
+}
