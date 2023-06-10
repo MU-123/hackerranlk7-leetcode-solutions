@@ -1,0 +1,62 @@
+import java.io.*;
+import java.util.*;
+import java.text.*;
+import java.math.*;
+import java.util.regex.*;
+
+public class Solution {
+    
+    static int gemStones(ArrayList<String> array)
+    {
+    	String firstString = array.get(0);
+    	
+    	// charset with all unique chars
+    	HashSet<String> charSet = new HashSet<String>();
+    	
+    	for (String c : firstString.split(""))
+    	{
+    		charSet.add(c);
+    	}
+    	
+    	int total = 0;
+    	for (String c : charSet)
+    	{
+    		Boolean exists = true;
+    		for (int i = 1 ; i < array.size() ; i++)
+    		{
+    			String thisLine = array.get(i);
+    			if (!thisLine.contains(c))
+    			{
+    				exists = false;
+    			}
+    		}
+    		
+    		if (exists)
+    			total++;
+    	}
+    	
+    	return total;
+    }
+
+   
+ public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        
+        int count = in.nextInt();
+        // escape the \n
+        in.nextLine();
+        ArrayList <String> arrayList = new ArrayList<String>(count);
+        
+        for (int i=0;i<count;i++)
+        {
+        	String line = in.nextLine();
+        	arrayList.add(line);
+        }
+        
+        in.close();
+        
+        int result = gemStones(arrayList);
+        System.out.println(result);
+        
+   }
+}
