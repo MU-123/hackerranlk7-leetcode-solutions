@@ -1,0 +1,77 @@
+import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
+
+class Main {
+  private static List<String> substrings(String s) {
+    int length = s.length();
+    List<String> list = new ArrayList<>();
+
+    for (int i = 0; i < length; i++) {
+      for (int j = i + 1; j <= length; j++) {
+        list.add(s.substring(i, j));
+      }
+    }
+    return list;
+  }
+
+  private static int solve(String text, int A, int C) {
+    int length = text.length();
+    StringBuilder sb = new StringBuilder(length);
+    Set<String> set  = new HashSet<>();
+
+    int cost = 0;
+    int len  = 0;
+    for (int i = 0; i < length; i++) {
+      len = sb.length();
+      if (len == 0) {
+        sb.append(text.charAt(0));
+        set.add(sb.toString());
+        cost += A;
+        continue;
+      }
+
+      while (len > 0) {
+        int sum = i + len;
+        int end = (sum > length) ? length : sum;
+        String lookAhead = text.substring(i, end);
+        if (set.contains(lookAhead)) {
+          if (lookAhead.length() == 1 && A <= C) {
+            cost += A;
+          } else {
+            cost += C;  
+          }
+
+          i += len - 1;
+          sb.append(lookAhead);
+          for (String sub : substrings(sb.toString())) {
+            set.add(sub);
+          } // end for
+          break;
+        } // end if
+        else {
+          if (lookAhead.length() == 1) {
+            cost += A;
+            sb.append(lookAhead);
+            for (String sub : substrings(sb.toString())) {
+              set.add(sub);
+            } // end for
+            break;
+          }
+          len--;
+        } // end else
+      } // end while
+    } // end for
+    //return sb.toString();
+    return cost;
+  }
+
+  public static void main(String[] args) {
+    System.out.println(solve("a", 4, 5));   // 4 A 
+    System.out.println(solve("ab", 4, 5));  // 8 A + A
+    System.out.println(solve("aba", 4, 3)); // 11 A + A + C
+    System.out.println(solve("aabaacaba", 4, 5)); // 26 A + A + A + C + A + C
+    System.out.println(solve("bacbacacb", 8, 9)); // 42 A + A + A + C + C
+  }
+}
