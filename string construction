@@ -1,0 +1,27 @@
+import java.io.*;
+import java.util.*;
+import java.text.*;
+import java.math.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    public static void main(String[] args) {
+        Scanner input = new Scanner(System.in);
+        int n = input.nextInt();
+        
+        for (int i = 0; i < n; i++)
+        {
+            int custo = 0;
+            String s = input.next();
+            StringBuilder p = new StringBuilder();
+            for (int j = 0; j < s.length(); j++)
+            {
+                String c = String.valueOf(s.charAt(j));
+                if (p.indexOf(c) == -1) ++custo;
+                p = p.append(c);
+            }
+            System.out.println(custo);
+        }
+    }
+}
