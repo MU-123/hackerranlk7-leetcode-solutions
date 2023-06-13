@@ -1,0 +1,72 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+
+public class SimilarStrings {
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        String line = in.nextLine();
+
+        // number of queries
+        int queries = Integer.parseInt(line.split(" ")[1]);
+        // data string
+        String string = in.nextLine();
+        // query lines
+        List<String> lines = new ArrayList<>();
+        for (int i = 0; i < queries; i++) {
+            lines.add(in.nextLine());
+        }
+        lines.stream().map(query -> solve(query, string))
+                .collect(Collectors.toList())
+                .stream()
+                .forEach(System.out::println);
+    }
+
+    private static int solve(String query, String string) {
+        String queryStrArr[] = query.split(" ");
+        int start = Integer.parseInt(queryStrArr[0]);
+        int end = Integer.parseInt(queryStrArr[1]);
+        // special case
+        if (end == start) {
+            return string.length();
+        }
+        String mainSubstring = string.substring(start - 1, end);
+        List<String> substrings = getOtherSubStrings(string, start, end);
+        // +1 for self
+        return (int) substrings.parallelStream()
+            .filter(substring -> equals(mainSubstring, substring))
+            .count() + 1;       
+    }
+
+    private static boolean equals(String string1, String string2) {
+        char[] arr1 = string1.toCharArray();
+        char[] arr2 = string2.toCharArray();
+
+        for (int i = 0; i < string1.length(); i++) {
+            for (int j = i + 1; j < string1.length(); j++) {
+                if (arr1[i] == arr1[j]) {
+                    if (arr2[i] != arr2[j]) {
+                        return false;
+                    }
+                } else if (arr2[i] == arr2[j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static List<String> getOtherSubStrings(String string, int start, int end) {
+        int length = end - start + 1;
+        List<String> lines = new ArrayList<>(string.length());
+        for (int i = 0; i <= string.length() - length; i++) {
+            if (i == start - 1) {
+                continue;
+            }
+            lines.add(string.substring(i, i + length));
+        }
+        return lines;
+    }
+   }
