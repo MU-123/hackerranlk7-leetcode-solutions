@@ -1,0 +1,193 @@
+import java.io.*;
+import java.util.*;
+
+public class Solution2 {
+
+  static class Drill {
+    int x1;
+    int y1;
+    int z;
+
+    int num = 1;
+    long sumX;
+    long sumY;
+
+    int invX1;
+    int invY1;
+    long invSumX;
+    long invSumY;
+    int inNum = 0;
+
+    Drill(int x1, int y1, int z) {
+      this.x1 = x1;
+      this.y1 = y1;
+      this.z = z;
+      this.sumX = x1 - y1;
+      this.sumY = (long) y1 + z + x1;
+
+      this.invX1 = x1;
+      this.invY1 = y1;
+      this.invSumX = (long) y1 + z + x1;
+      this.invSumY = y1 - x1;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      Drill c = (Drill) obj;
+      return x1 == c.x1 && y1 == c.y1 && z == c.z;
+    }
+
+    void addInvRotation(Drill c) {
+      sumX += c.sumY;
+      sumY -= c.sumX;
+      num = (num + c.num) % 4;
+
+      long tinvSumX = invSumX;
+      inNum = (c.inNum + 1) % 4;
+      int x = invX1;
+      int y = invY1;
+      invX1 = (int) c.invSumX;
+      invY1 = (int) c.invSumY;
+      switch (inNum) {
+        case 0:
+          invSumX = c.invSumX + invSumX;
+          invSumY = c.invSumY + invSumY;
+
+          invX1 += x;
+          invY1 += y;
+          break;
+
+        case 1:
+          invSumX = c.invSumX - invSumY;
+          invSumY = c.invSumY + tinvSumX;
+
+          invX1 -= y + z;
+          invY1 += x;
+          break;
+
+        case 2:
+          invSumX = c.invSumX - invSumX;
+          invSumY = c.invSumY - invSumY;
+
+          invX1 -= x + z;
+          invY1 -= y + z;
+          break;
+
+        case 3:
+          invSumX = c.invSumX + invSumY;
+          invSumY = c.invSumY - tinvSumX;
+
+          invX1 += y;
+          invY1 -= x + z;
+          break;
+      }
+    }
+
+    boolean check(int x, int y) {
+      return (x >= invX1 && x <= invX1 + z && y >= invY1 && y <= invY1 + z);
+    }
+  }
+
+  static Drill findDrill(Drill[] commands, int sCount, int x, int y) {
+      if (!commands[0].check(x, y)) {
+          return null;
+      }
+      int last = sCount - 1;
+      if (commands[last].check(x, y)) {
+          return commands[last];
+      }
+      int first = 0;
+      while (first < last - 1) {
+          int pivot = first + (last - first) / 2; 
+          if (commands[pivot].check(x, y)) {
+              first = pivot;
+          } else {
+              last = pivot;
+          }
+      }
+
+    return commands[first];
+  }
+
+  public static void main(String[] args) throws IOException {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    BufferedWriter bw = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+    StringTokenizer st = new StringTokenizer(br.readLine());
+    int n = Integer.parseInt(st.nextToken());
+
+    st = new StringTokenizer(br.readLine());
+    int s = Integer.parseInt(st.nextToken());
+
+    Drill[] commands = new Drill[s];
+    int sCount = 0;
+    for (int i = 0; i < s; i++) {
+      st = new StringTokenizer(br.readLine());
+      int x = Integer.parseInt(st.nextToken()) - 1;
+      int y = Integer.parseInt(st.nextToken()) - 1;
+      int z = Integer.parseInt(st.nextToken());
+
+      if (z == 0) {
+        continue;
+      }
+
+      Drill c = new Drill(x, y, z);
+      if (sCount == 0) {
+        commands[0] = c;
+        sCount++;
+      } else {
+        c.addInvRotation(commands[sCount - 1]);
+        if (commands[sCount - 1].equals(c)) {
+          commands[sCount - 1] = c;
+        } else {
+          commands[sCount] = c;
+          sCount++;
+        }
+      }
+    }
+
+    st = new StringTokenizer(br.readLine());
+    int l = Integer.parseInt(st.nextToken());
+    for (int i = 0; i < l; i++) {
+      st = new StringTokenizer(br.readLine());
+      long item = Long.parseLong(st.nextToken());
+      int x = (int) (item / n);
+      int y = (int) (item % n);
+
+      Drill c = findDrill(commands, sCount, x, y);
+
+      if (c != null) {
+        long mx = c.sumX;
+        long my = c.sumY;
+        switch (c.num) {
+          case 0:
+            mx += x;
+            my += y;
+            break;
+
+          case 1:
+            mx += y;
+            my -= x;
+            break;
+
+          case 2:
+            mx -= x;
+            my -= y;
+            break;
+
+          case 3:
+            mx -= y;
+            my += x;
+            break;
+        }
+        x = (int) mx;
+        y = (int) my;
+      }
+      bw.write((x + 1) + " " + (y + 1) + "\n");
+    }
+
+    bw.newLine();
+    bw.close();
+    br.close();
+  }
+}
