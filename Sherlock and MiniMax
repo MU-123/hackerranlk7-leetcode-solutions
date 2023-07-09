@@ -1,0 +1,75 @@
+import java.io.*;
+import java.util.Arrays;
+
+
+
+public class Solution {
+	public static void main(String[] args) throws IOException {
+		int N;
+		long[] A;
+		long P, Q;
+		BufferedReader bi = new BufferedReader(new InputStreamReader(System.in));
+		N = Integer.parseInt(bi.readLine().trim());
+		A = new long[N];
+		String[] inStr = bi.readLine().trim().split("\\s+");
+		for(int i=0;i<N;i++) 
+			A[i] = Long.parseLong(inStr[i]);
+		inStr = bi.readLine().trim().split("\\s+");
+		P = Long.parseLong(inStr[0]);
+		Q = Long.parseLong(inStr[1]);
+		Arrays.sort(A);
+		long maxDist = 0;
+		long maxLoc = Long.MAX_VALUE;
+		if(P <= A[0]) {
+			maxDist = A[0] - P;
+			maxLoc = P;
+		}
+		if(Q >= A[N-1]){
+			if(Q - A[N-1] > maxDist) {
+				maxDist = Q - A[N-1];
+				maxLoc = Q;
+			}
+		}
+		for(int i=0;i<N-1;i++){
+			if(P >= A[i] && P <= A[i+1]) {
+				long minD = Math.min(P - A[i], A[i+1] - P);
+				if (minD > maxDist) {
+					maxDist = minD;
+					maxLoc = P;
+				}
+				else if(minD == maxDist)
+					maxLoc = Math.min(maxLoc, P);
+			}
+			if(Q >= A[i] && Q <= A[i+1]) {
+				long minD = Math.min(Q - A[i], A[i+1] - Q);
+				if (minD > maxDist) {
+					maxDist = minD;
+					maxLoc = Q;
+				}
+				else if(minD == maxDist)
+					maxLoc = Math.min(maxLoc, Q);
+			}
+			long midPt = (A[i+1] + A[i])/2;
+			if(Q >= midPt && P <= midPt) {
+				long minD = Math.min(midPt - A[i], A[i+1] - midPt);
+				if (minD > maxDist) {
+					maxDist = minD;
+					maxLoc = midPt;
+				}
+				else if(minD == maxDist)
+					maxLoc = Math.min(maxLoc, midPt);
+			}
+			if(Q >= (midPt + 1) && P <= (midPt + 1) && (midPt + 1 <= A[i+1])) {
+				long minD = Math.min(midPt + 1 - A[i], A[i+1] - midPt - 1);
+				if (minD > maxDist) {
+					maxDist = minD;
+					maxLoc = midPt;
+				}
+				else if(minD == maxDist)
+					maxLoc = Math.min(maxLoc, midPt + 1);
+			}
+		}
+
+		System.out.println(maxLoc);
+	}
+}
