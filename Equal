@@ -1,0 +1,44 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.StringTokenizer;
+
+
+public class Equal {
+    public static ArrayList<Integer> chocoDist ;
+    public static int steps ;
+
+
+    public static void main(String[] args) throws NumberFormatException, IOException
+    {    
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        int testCases = Integer.parseInt( in.readLine() );
+        //System.out.println("testCases "+testCases);
+        int testCount = 0;
+
+        while( testCount < testCases)
+        {
+            chocoDist = new ArrayList<Integer>();
+            int coInterns = Integer.parseInt(in.readLine()) ;
+            StringTokenizer st = new StringTokenizer(in.readLine());
+            while( st.hasMoreTokens())    chocoDist.add(Integer.parseInt(st.nextToken()));
+            //System.out.println("coInterns "+coInterns+" chocoDist "+chocoDist.toString());
+            Collections.sort(chocoDist);
+            int sum = 0;
+            int sum1 = 1;
+            int sum2 = 1;
+            for(int i = 1 ; i < chocoDist.size() ; i++)	{
+            	int diff = chocoDist.get(i) - chocoDist.get(0);
+            	sum += diff/5 + (diff%5)/2 + (diff%5)%2/1;
+            	diff+=1 ;
+            	sum1 += diff/5 + (diff%5)/2 + (diff%5)%2/1;
+            	diff+=1 ;
+            	sum2 += diff/5 + (diff%5)/2 + (diff%5)%2/1;
+            }
+            System.out.println(Math.min(Math.min(sum, sum1), sum2));
+        }
+    }
+
+}
