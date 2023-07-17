@@ -1,0 +1,80 @@
+import java.io.*;
+import java.math.*;
+import java.text.*;
+import java.util.*;
+import java.util.regex.*;
+
+public class Solution {
+    private static final long MOD = 1000000007;
+    private static final int MAX_N = 1210;
+    
+    private static int min(int a, int b) { return a < b ? a : b; }
+    
+    static int arrayMerging(int[] m) {
+        long[][] f = new long[MAX_N][MAX_N];
+        long[][] c = new long[MAX_N][MAX_N];
+        long[] factor = new long[MAX_N];
+        
+        int n = m.length;
+        
+        c[1][1] = 1; c[1][0] = 1;
+        
+        for (int i = 2; i <= n; i ++) for (int j = 0; j <= i; j ++) {
+            if (j == 0) c[i][j] = 1;
+            else c[i][j] = (c[i - 1][j] + c[i - 1][j - 1]) % MOD;
+        }
+        
+        factor[1] = 1;
+        for (int i = 2; i <= n; i ++) factor[i] = (factor[i - 1] * (long)i) % MOD;
+        
+        int endNodes = 1, mnEndNodes = n;
+        f[1][1] = 1; f[0][0] = 1;
+        for (int i = 2; i <= n; i ++) {
+            if (m[i - 2] > m[i - 1]) {                
+                mnEndNodes = min(mnEndNodes, endNodes);
+                endNodes = 1;
+            }
+            else endNodes ++;
+            
+            for (int j = 1; j <= min(endNodes - j, mnEndNodes) || j <= min(endNodes, mnEndNodes); j ++) {
+                if (i == j) f[i][j] = 1;
+                
+                for (int k = j; k <= i - j; k ++) {
+                    f[i][j] = (f[i][j] + (((f[i - j][k] * c[k][j]) % MOD) * factor[j]) % MOD) % MOD;
+                }
+            }
+        }
+        
+        long ans = 0;
+        for (int i = 1; i <= endNodes; i ++) ans = (ans + f[n][i]) % MOD;
+        return (int)ans;
+    }
+
+    private static final Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+        int mCount = scanner.nextInt();
+        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])*");
+
+        int[] m = new int[mCount];
+
+        String[] mItems = scanner.nextLine().split(" ");
+        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])*");
+
+        for (int mItr = 0; mItr < mCount; mItr++) {
+            int mItem = Integer.parseInt(mItems[mItr]);
+            m[mItr] = mItem;
+        }
+
+        int result = arrayMerging(m);
+
+        bufferedWriter.write(String.valueOf(result));
+        bufferedWriter.newLine();
+
+        bufferedWriter.close();
+
+        scanner.close();
+    }
+}
