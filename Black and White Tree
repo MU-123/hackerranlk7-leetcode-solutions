@@ -1,0 +1,141 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Stack;
+public class BlackAndWhiteTree {
+    static final List<Graph> graphs = new ArrayList<>();
+    static int ones = 0;
+    static int zeroes = 0;
+    public static void main(String[] args) throws Exception {
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(System.in))) {
+            String[] line = br.readLine().split(" ");
+            Node[] nodes = new Node[Integer.parseInt(line[0])];
+            for (int e = 0; e < nodes.length; e++) {
+                nodes[e] = new Node(e);
+            }
+            for (int e = Integer.parseInt(line[1]); e > 0; e--) {
+                line = br.readLine().split(" ");
+                nodes[Integer.parseInt(line[0]) - 1].adjacent.add(nodes[Integer.parseInt(line[1]) - 1]);
+                nodes[Integer.parseInt(line[1]) - 1].adjacent.add(nodes[Integer.parseInt(line[0]) - 1]);
+            }
+            int components = 0;
+            for (int e = 0; e < nodes.length; e++)
+                if (!nodes[e].visited) {
+                    Graph g = new Graph(nodes[e]);
+                    if (g.diffs == 0) {
+                        zeroes++;
+                    } else if (g.diffs == 1) {
+                        ones++;
+                    } else {
+                        components += g.diffs;
+                    }
+                    graphs.add(g);
+                }
+            Collections.sort(graphs, (g1, g2) -> Math.abs(g1.diffs) - Math.abs(g2.diffs));
+            final int SIZE = components / 2 + 1;
+            boolean[] dinam = new boolean[SIZE];
+            int[] parent = new int[SIZE];
+            Arrays.fill(parent, Integer.MAX_VALUE);
+            dinam[0] = true;
+            int lastMax = 0;
+            for (int g = ones + zeroes; g < graphs.size(); g++) {
+                final int dif = graphs.get(g).diffs, top = Math.min(SIZE, lastMax + dif + 1);
+                for (int e = top - 1; e >= dif; e--) {
+                    dinam[e] |= dinam[e - dif];
+                    if (dinam[e - dif]) {
+                        parent[e] = Math.min(parent[e], dif);
+                    }
+                }
+                lastMax += dif;
+            }
+            int min = 0;
+            int mindiff = components;
+            for (int e = 0; e < SIZE; e++)
+                if (dinam[e] && calcMin(Math.abs(components - 2 * e)) < calcMin(Math.abs(components - 2 * min))) {
+                    min = e;
+                    mindiff = Math.abs(components - 2 * e);
+                }
+            final int minValue = calcMin(Math.abs(components - 2 * min));
+            for (int g = graphs.size() - 1; g >= 0; g--) {
+                if (graphs.get(g).diffs == 0) {
+                } else if (graphs.get(g).diffs == 1) {
+                    graphs.get(g).signum = g < zeroes + mindiff || (g % 2) == 1;
+                } else if (min > 0 && parent[min] == graphs.get(g).diffs) {
+                    graphs.get(g).signum = true;
+                    min -= graphs.get(g).diffs;
+                }
+            }
+            Collections.sort(graphs, (g1, g2) -> Boolean.compare(g1.signum, g2.signum));
+            Graph root = graphs.get(graphs.size() - 1);
+            System.out.println(minValue + " " + (graphs.size() - 1));
+            for (int g = 0; g < graphs.size() - 1; g++) {
+                if (graphs.get(g).signum == root.signum) {
+                    root.root.adjacent.get(0).adjacent.add(graphs.get(g).root);
+                    graphs.get(g).root.adjacent.add(root.root.adjacent.get(0));
+                    System.out.println(root.root.adjacent.get(0).id + " " + graphs.get(g).root.id);
+                } else {
+                    root.root.adjacent.add(graphs.get(g).root);
+                    graphs.get(g).root.adjacent.add(root.root);
+     System.out.println(root.root.id + " " + graphs.get(g).root.id);
+                }
+            }
+        }
+    }
+    public static int calcMin(int x) {
+        if (ones < x) {
+            return x - ones;
+        }
+        return (ones - x) % 2;
+    }
+    static class Graph {
+        Node root;
+        int whites, blacks, diffs, size;
+        boolean signum = false;
+        public Graph(Node root) {
+            this.root = root;
+            Stack<Node> n = new Stack<>();
+            n.add(root);
+            while (!n.isEmpty()) {
+                Node next = n.pop();
+                if (next.visited)
+                    continue;
+                next.parent = root.parent;
+                next.visited = true;
+                if (next.isWhite) {
+                    whites++;
+                } else {
+                    blacks++;
+                }
+                for (Node e : next.adjacent) {
+                    e.isWhite = !next.isWhite;
+                    n.push(e);
+                }
+            }
+            diffs = blacks - whites;
+            size = blacks + whites;
+            if (blacks - whites < 0) {
+                invert();
+            }
+        }
+        public void invert() {
+            root = root.adjacent.get(0);
+            int t = blacks;
+            blacks = whites;
+            whites = t;
+            diffs = blacks - whites;
+            size = blacks + whites;
+        }
+    }
+    static class Node {
+        int parent, id;
+        boolean isWhite, visited;
+        ArrayList<Node> adjacent = new ArrayList<>();
+        public Node(int parent) {
+            this.parent = parent;
+            this.id = parent + 1;
+        }
+    }
+}
