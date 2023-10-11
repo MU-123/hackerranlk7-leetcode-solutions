@@ -1,0 +1,65 @@
+import java.io.*;
+import java.util.*;
+
+public class Solution {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int T = sc.nextInt();
+        while(T>0){
+            int n = sc.nextInt();
+            List<Integer> cells = new ArrayList<>();
+            fillArr(cells, sc.next());
+            fillArr(cells, sc.next());
+            if(tile(cells)){
+                System.out.println("YES");
+            } else {
+                System.out.println("NO");
+            }
+            T--;
+        }        
+    }
+    
+   private static void fillArr(List<Integer> arr, String data) {
+        for (int i = 0; i < data.length(); i++) {
+            arr.add(data.charAt(i) - '0');
+        }
+    }
+    
+    public static boolean tile(List<Integer> list) {
+        // set i+n, i+n-1, i+1 cells
+        int cSize = list.size() / 2;
+        Deque<List<Integer>> deque = new ArrayDeque<>();
+        deque.addFirst(list);
+        while (!deque.isEmpty()) {
+            List<Integer> cells = deque.removeLast();
+            int index = getFreeCellIndex(cells);
+            if (index < 0) return true;
+            if (index != cSize - 1)
+                tilePossibleCells(deque, cells, index, index + 1);
+            if (index != 0 && index != cSize)
+                tilePossibleCells(deque, cells, index, index + cSize - 1);
+            tilePossibleCells(deque, cells, index, index + cSize);
+        }
+        return false;
+    }
+
+    private static void tilePossibleCells(Deque<List<Integer>> deque, List<Integer> cells, int index, int next) {
+        if (next < cells.size()) {
+            if (cells.get(next) == 0) {
+                ArrayList<Integer> newCell = new ArrayList<>(cells);
+                newCell.set(next, 5);
+                newCell.set(index, 5);
+                //      System.out.println("added: " + newCell);
+                deque.addFirst(newCell);
+            }
+        }
+    }
+
+    private static int getFreeCellIndex(List<Integer> cells) {
+        for (int i = 0; i < cells.size(); i++) {
+            if (cells.get(i) == 0) return i;
+        }
+        return -1;
+    }
+}
