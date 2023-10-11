@@ -1,0 +1,46 @@
+import java.io.*;
+import java.util.*;
+
+public class Solution {
+
+  static long turnOffTheLights(int k, int[] arr) {
+    long result = Long.MAX_VALUE;
+    for(int beg = 1; beg <= 1 + k; beg++) {
+        long cost = 0;
+        int nxt = beg;
+        while(nxt < arr.length) {
+            cost += arr[nxt];
+            nxt = nxt + 2 * k + 1;
+        }
+        nxt = nxt - 2 * k - 1;
+        if(nxt + k >= arr.length-1) {
+          result = Math.min(cost, result);
+        }
+    }
+    return result;
+  }
+
+  public static void main(String[] args) throws IOException {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    BufferedWriter bw = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+    StringTokenizer st = new StringTokenizer(br.readLine());
+    int n = Integer.parseInt(st.nextToken());
+    int k = Integer.parseInt(st.nextToken());
+
+    int[] c = new int[n+1];
+    st = new StringTokenizer(br.readLine());
+    for (int cItr = 1; cItr <= n; cItr++) {
+      int cItem = Integer.parseInt(st.nextToken());
+      c[cItr] = cItem;
+    }
+
+    long result = turnOffTheLights(k, c);
+
+    bw.write(String.valueOf(result));
+    bw.newLine();
+
+    bw.close();
+    br.close();
+  }
+}
