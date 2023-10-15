@@ -1,0 +1,105 @@
+import java.io.*;
+import java.math.*;
+import java.text.*;
+import java.util.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    static int MOD = 1000000007;
+    
+    static int N;
+    static int[] arr;
+    static List<Integer> listS;
+    static int[] pSum;
+    static int[] frec;
+    static int sizePS;
+    static int maxS = 100010;
+    static int[][] memo = new int[60][maxS];
+    
+    static void init() {
+        listS = new ArrayList<Integer>();
+        for (int s = 1; s < (1 << N); s++){ 
+            int x = 0;
+            for (int t = 0; t < N; t++) {
+                if ((s & (1 << t)) > 0) {
+                    x += arr[t];
+                }
+            }
+            listS.add(x);            
+        }
+        Collections.sort(listS);
+        sizePS = listS.size();
+        pSum = new int[sizePS];
+        frec = new int[sizePS];
+        int last = listS.get(0);
+        pSum[0] = last;
+        frec[0] = 1;
+        int index = 0;
+        for(int k = 1;k < sizePS;k++) {
+            int next = listS.get(k);
+            if(next == last) {
+                frec[index]++;
+            } else {
+                last = next;
+                pSum[++index] = next;
+                frec[index] = 1;
+            }
+        }
+        sizePS = index+1;
+    }
+
+    static int countWays(long l, long r) {
+        init();
+        int aR = recCalc(r, 0);
+        memo = new int[60][maxS];
+        return (aR + MOD - recCalc(l-1, 0)) % MOD; 
+    }
+
+    private static int recCalc(long l, int pos) {
+        if(l == 0) {
+            return 0;
+        }
+        int ans = 0;
+        if((ans = memo[pos][(int) (l%maxS)]) >= 1) {
+            return ans-1;
+        }
+        
+        ans = recCalc(l/2, pos+1);
+        for(int k = 0;k < sizePS;k++) {
+            int a = pSum[k];
+            if(l >= a) {
+                int pa = 1+recCalc((l-a)/2, pos+1);
+                ans = (int) ((ans + (long)frec[k] * pa) % MOD);
+            }else {
+                break;
+            }
+        }
+        memo[pos][(int) (l%maxS)] = ans+1;
+        return ans;
+    }
+
+    private static final Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+        N = scanner.nextInt();
+        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])*");
+        arr = new int[N];
+        String[] arrItems = scanner.nextLine().split(" ");
+        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])*");
+        for (int arrItr = 0; arrItr < N; arrItr++) {
+            int arrItem = Integer.parseInt(arrItems[arrItr]);
+            arr[arrItr] = arrItem;
+        }
+        String[] lr = scanner.nextLine().split(" ");
+        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])*");
+        long l = Long.parseLong(lr[0]);
+        long r = Long.parseLong(lr[1]);
+        int result = countWays(l, r);
+        bufferedWriter.write(String.valueOf(result));
+        bufferedWriter.newLine();
+        bufferedWriter.close();
+        scanner.close();
+    }
+}
