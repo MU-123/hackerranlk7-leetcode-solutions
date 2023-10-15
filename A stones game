@@ -1,0 +1,86 @@
+import java.io.*;
+import java.util.Scanner;
+
+public class AStoneGame {
+
+    private static int log2(int val) {
+        return 31 - Integer.numberOfLeadingZeros(val);
+    }
+
+    private static int solve(int val) {
+        if (val <= 1) return val;
+
+        int maxNim = log2(val) + 1;
+        int maxNimCnt = val - (1 << (maxNim - 1)) + 1;
+
+        if (maxNimCnt % 2 == 0) return 1;
+
+        int nimToReduce = 1 << log2(maxNim);
+
+        int targetNim = maxNim;
+        targetNim = targetNim ^ nimToReduce;
+        targetNim = targetNim ^ 1;
+
+        int targetValueToReduce = (1 << (nimToReduce - 1));
+        int reduceTo = (1 << (targetNim)) - 1;
+        int minCut = targetValueToReduce / 2 + targetValueToReduce % 2;
+
+        return targetValueToReduce - minCut >= reduceTo ? targetValueToReduce - reduceTo : minCut;
+    }
+
+    public static void main(String[] params) throws Exception {
+        Scanner scanner = new Scanner(System.in);
+        OutputWriter writer = new OutputWriter(System.out);
+
+        int t = Integer.valueOf(scanner.nextLine());
+        for (int i = 0; i < t; ++i) {
+            writer.printInt(solve(Integer.valueOf(scanner.nextLine())));
+            writer.newLine();
+        }
+        writer.flush();
+    }
+
+    static class OutputWriter {
+        private static final int outBufferSize = 1 << 25;
+
+        private PrintStream out;
+        private byte[] outBuffer = new byte[outBufferSize];
+        private int outByteCnt = 0;
+        private byte[] intToStringBuffer = new byte[11];
+
+        public OutputWriter(PrintStream out) {
+            this.out = out;
+        }
+
+        public void flush() {
+            out.write(outBuffer, 0, outByteCnt);
+        }
+
+        public void printInt(int val) {
+            int outBufferPos = intToStringBuffer.length;
+            if (val == 0) {
+                outBufferPos = intToStringBuffer.length - 1;
+                intToStringBuffer[outBufferPos] = '0';
+            } else {
+                boolean minus = false;
+                if (val < 0) {
+                    minus = true;
+                    val = -val;
+                }
+                while (val != 0) {
+                    byte digitChar = (byte)(val % 10 + '0');
+                    intToStringBuffer[--outBufferPos] = digitChar;
+                    val = val / 10;
+                }
+                if (minus) intToStringBuffer[--outBufferPos] = '-';
+            }
+
+            System.arraycopy(intToStringBuffer, outBufferPos, outBuffer, outByteCnt, intToStringBuffer.length - outBufferPos);
+            outByteCnt += intToStringBuffer.length - outBufferPos;
+        }
+
+        public void newLine() {
+            outBuffer[outByteCnt++] = '\n';
+        }
+    }
+}
