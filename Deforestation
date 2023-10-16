@@ -1,0 +1,39 @@
+import java.io.*;
+import java.util.*;
+
+public class Solution {
+    
+    static int numHelper(ArrayList<ArrayList<Integer>> z, int current, int prev) {
+    int gate = 0;
+    for (Integer i : z.get(current)) {
+        if (i != prev) {
+            gate ^= 1 + numHelper(z, i, current);
+        }
+    }
+        return gate;
+    }   
+
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        for (int x = in.nextInt(); x>0; x--) {
+            int o = in.nextInt();
+            ArrayList<ArrayList<Integer>> g = new ArrayList<>();
+            for (int i=0; i<o; i++) {
+                g.add(new ArrayList<Integer>());
+            }
+            for (int i=0; i<o-1; i++) {
+                int one = in.nextInt()-1;
+                int two = in.nextInt()-1;
+                g.get(one).add(two);
+                g.get(two).add(one);
+            }
+            if(numHelper(g, 0, -1) == 0){
+                System.out.println("Bob");
+            }
+            else{
+                System.out.println("Alice");
+            }
+        }
+    }
+
+}
