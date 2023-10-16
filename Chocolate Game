@@ -1,0 +1,81 @@
+import java.io.*;
+import java.math.*;
+import java.text.*;
+import java.util.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    /*
+     * Complete the chocolateGame function below.
+     */
+    static long chocolateGame(int[] arr) {
+        long result = (arr.length - 1L)*arr.length/2;
+        
+        Map<Integer, Integer> sums = new HashMap<>();
+        sums.put(0, 1);
+        int sum = 0;
+        for (int i = arr.length - 2; i >= 0; i -= 2) {
+            int x = sum ^ arr[i + 1];
+            sum ^= arr[i + 1] - arr[i];
+            
+            int a = sums.getOrDefault(x, 0);
+            int b = sums.getOrDefault(sum, 0);
+            sums.put(sum, b + 1);
+            
+            result -= a + b;
+        }
+        if (arr.length % 2 == 1) {
+            sum ^= arr[0];
+            result -= sums.getOrDefault(sum, 0);
+        }
+        
+        sums = new HashMap<>();
+        sums.put(0, 1);
+        sum = 0;
+        for (int i = arr.length - 3; i >= 0; i -= 2) {
+            int x = sum ^ arr[i + 1];
+            sum ^= arr[i + 1] - arr[i];
+            
+            int a = sums.getOrDefault(x, 0);
+            int b = sums.getOrDefault(sum, 0);
+            sums.put(sum, b + 1);
+            
+            result -= a + b;
+        }
+        if (arr.length % 2 == 0) {
+            sum ^= arr[0];
+            result -= sums.getOrDefault(sum, 0);
+        }
+        
+        return result;
+    }
+
+    private static final Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+        int arrCount = scanner.nextInt();
+        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])*");
+
+        int[] arr = new int[arrCount];
+
+        String[] arrItems = scanner.nextLine().split(" ");
+        scanner.skip("(\r\n|[\n\r\u2028\u2029\u0085])*");
+
+        for (int arrItr = 0; arrItr < arrCount; arrItr++) {
+            int arrItem = Integer.parseInt(arrItems[arrItr]);
+            arr[arrItr] = arrItem;
+        }
+
+        long result = chocolateGame(arr);
+
+        bufferedWriter.write(String.valueOf(result));
+        bufferedWriter.newLine();
+
+        bufferedWriter.close();
+
+        scanner.close();
+    }
+}
