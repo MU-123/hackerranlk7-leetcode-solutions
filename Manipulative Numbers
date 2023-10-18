@@ -1,0 +1,52 @@
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class Solution
+{
+int n;
+Scanner sc=new Scanner(System.in);
+long[] arr;
+void kks()
+{
+n=sc.nextInt();
+arr=new long[n];
+for(int i=0;i<n;i++)
+arr[i]=sc.nextLong();
+}
+boolean kk(long[] arr)
+{
+Arrays.sort(arr);
+for(int i=0;i<n;)
+{
+long t=arr[i];
+int c=0;
+for(;i<n&&arr[i]==t;i++)
+c++;
+if (c>n/2) 
+return false;
+}
+return true;
+}
+void kkk()
+{
+for (int k=32;k>=0;k--)
+{
+long[] temp=new long[n];
+for (int j=0;j<n;j++) 
+temp[j]=arr[j]>>k;
+if (kk(temp))
+{
+System.out.println(k);
+return;
+}
+}
+System.out.println("-1");
+}
+    
+public static void main(String[] args)
+{
+    Solution ob=new Solution();
+    ob.kks();
+    ob.kkk();
+}
+}
