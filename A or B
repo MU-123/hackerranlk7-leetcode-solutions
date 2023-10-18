@@ -1,0 +1,103 @@
+import java.io.*;
+import java.util.*;
+
+public class Solution {
+    static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        int bl = len/2;
+        if(s.length()%2==1) bl++;
+        byte[] data = new byte[bl];
+        for (int i = 0; i < len/2; i += 1) {
+            data[i] = (byte) ((Character.digit(s.charAt(i*2), 16) << 4)
+                    + Character.digit(s.charAt(i*2+1), 16));
+        }
+        if(s.length()%2==1)data[bl-1]=(byte) ((Character.digit(s.charAt(len-1), 16) << 4));
+        return data;
+    }
+
+    public static void main(String[] args) throws IOException {
+        Scanner in = new Scanner(System.in);
+        int T = in.nextInt();
+        for(int i1=0;i1<T;i1++){
+            int k = in.nextInt();
+            String s1 = in.next();
+            String s2 = in.next();
+            String tar = in.next();
+            System.out.println(p(k,s1,s2,tar));
+        }
+     }
+    static String p(int k, String s1, String s2,String tar){
+        int n = s1.length();
+        byte[] b1 = hexStringToByteArray(s1);
+        byte[] b2 = hexStringToByteArray(s2);
+        byte[] btar = hexStringToByteArray(tar);
+        for(int i=0;i<b1.length;i++){
+            for(int j=0;j<8;j++){
+                int bit = (1<<j);
+                if((btar[i] & bit)==0){
+                    if((b1[i]&bit)!=0){
+                        b1[i]= (byte)(b1[i]&(~bit));
+                        k--;
+                    }
+                    if((b2[i]&bit)!=0){
+                        b2[i]= (byte)(b2[i]&(~bit));
+                        k--;
+                    }
+                }else{
+                    if((b1[i]&bit)==0&&(b2[i]&bit)==0){
+                        b2[i]= (byte)(b2[i]|(bit));
+                        k--;
+                    }
+                }
+            }
+        }
+        if(k<0) return "-1";
+        for(int i=0;i<b1.length&&k>0;i++){
+            for(int j=7;j>=0&&k>0;j--){
+                int bit = (1<<j);
+                if((b1[i] & bit)!=0){
+                    if((b2[i]&bit)!=0){
+                        b1[i]= (byte)(b1[i]&(~bit));
+                        k--;
+                    }else if(k>1){
+                        b1[i]= (byte)(b1[i]&(~bit));
+                        b2[i]= (byte)(b2[i]|(bit));
+                        k-=2;
+                    }
+                }
+            }
+        }
+        StringBuilder sb =new StringBuilder(2*n+1);
+        putString(b1,sb,n);
+        sb.append('\n');
+        putString(b2,sb,n);
+        return sb.toString();
+    }
+    private static void putString(byte[] b, StringBuilder sb, int n){
+        boolean zero = true;
+        int initlth = sb.length();
+        for(int i=0;i<n/2;i++){
+            char c1 = HEXES.charAt((b[i] & 0xF0) >> 4);
+            char c2 = HEXES.charAt((b[i] & 0x0F));
+            if(zero){
+                if(c1!='0'){
+                    zero = false;
+                    sb.append(c1);
+                }
+            }else{
+                sb.append(c1);
+            }
+            if(zero){
+                if(c2!='0'){
+                    zero = false;
+                    sb.append(c2);
+                }
+            }else{
+                sb.append(c2);
+            }
+        }
+        if(n%2==1) sb.append(HEXES.charAt((b[n/2] & 0xF0) >> 4));
+        if(sb.length() == initlth) sb.append('0');
+    }
+    private static final String    HEXES    = "0123456789ABCDEF";
+}
