@@ -1,0 +1,105 @@
+import java.io.*;
+import java.math.*;
+import java.text.*;
+import java.util.*;
+import java.util.regex.*;
+
+public class Solution {
+
+  static final long MODULO = 1_000_000_007;
+  static int[] mi;
+
+  static int solve(int n, int k) {
+    int[][] vx = new int[n+1][32];
+    for (int i = 0; i <= 31; i++) {
+      vx[0][i] = 0;
+    }
+    
+    int[][][] dp = new int[n+1][32][2];
+    dp[0][0][0] = 1;
+
+    for (int i = 1; i <= n; i++) {
+      for (int j = 0; j < 31; j++) {
+        vx[i][j] = (vx[i-1][j] ^ (mi[i]&(1<<j)));
+      }
+    }
+
+    boolean[] valid = new boolean[32];
+    valid[31] = true;
+
+    for (int i = 30; i >= 0; i--) {
+      valid[i] = valid[i+1] && (vx[n][i] == (k & (1<<i)));
+    }
+
+    for (int i = 1; i <= n; i++) {
+      for (int j = 0; j < 31; j++) {
+        for (int kj = 0; kj < 2; kj++) {
+          if (dp[i-1][j][kj] == 0) continue;
+
+          for (int k1 = 0; k1 < 31; k1++) {
+            if ((mi[i] & (1<<(k1))) != 0) {
+              int small, tmpj, tmpkj;
+
+              if (k1 > j) {
+                small = j;
+                tmpj = k1;
+                tmpkj = (vx[i-1][k1] != 0 ? 1 : 0);
+              } else {
+                small = k1;
+                tmpj = j;
+
+                if (k1 == j) {
+                  tmpkj = kj;
+                } else {
+                  tmpkj = kj^((mi[i] & (1<<j)) != 0 ? 1 : 0);
+                }
+              }
+
+              dp[i][tmpj][tmpkj] = (int)((dp[i][tmpj][tmpkj] + ((long) dp[i-1][j][kj]) * (1<<small)) % MODULO);
+            }
+          }
+        }
+      }
+    }
+
+    int res = 0;
+
+    for(int i = 30; i >= 0; i--) {
+      if (valid[i+1]) {
+        res = (int) ((res + dp[n][i][(k & (1<<i)) != 0 ? 1 : 0]) % MODULO);
+      } else {
+        break;
+      }
+    }
+
+    return res;
+  }
+  
+  public static void main(String[] args) throws IOException {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    BufferedWriter bw = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+    StringTokenizer st = new StringTokenizer(br.readLine());
+    int n = Integer.parseInt(st.nextToken());
+    mi = new int[n+1];
+
+    st = new StringTokenizer(br.readLine());
+    for (int i = 1; i <= n; i++) {
+      int pItem = Integer.parseInt(st.nextToken());
+      mi[i] = pItem + 1;
+    }
+
+    int result = solve(n, 0);
+
+    for(int i = 1; i <= n; i++) {
+      mi[i]--;
+    }
+    result = (int)((result + MODULO - solve(n, 0)) % MODULO);
+    
+    bw.write(String.valueOf(result));
+    bw.newLine();
+
+    bw.close();
+    br.close();
+  }
+}
