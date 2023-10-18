@@ -1,0 +1,66 @@
+#include <cmath>
+#include <cstdio>
+#include <vector>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+typedef unsigned long long ul_t;
+
+int main() {
+    /* Enter your code here. Read input from STDIN. Print output to STDOUT */   
+    int t;
+    cin >> t;
+    while(t--){
+        int n;
+        cin >> n;
+        std::vector<ul_t> v(n);
+        for(auto &a : v) cin >> a;
+
+        ostringstream outOSS;
+        if(n%2==1){
+            if(n==1){
+                outOSS << "1 1 ";
+                if(v[0]>1) outOSS << v[0]-1 << " ";
+            }
+            else{
+                for (int i = 0; i < n-3; ++i) outOSS << v[i] << " ";
+                const ul_t x = v[n-3];
+                const ul_t y = v[n-2];
+                const ul_t z = v[n-1];
+
+                if(y==1) outOSS << x+1 << " 1 ";
+                else     outOSS << x << " " << y-1 << " 1 1 ";
+
+                if(z>1)  outOSS << z-1 << " ";
+            }
+        }
+        else if(n%2==0){
+            if(n==2){
+                outOSS << "1 ";
+                if(v[0]>1) outOSS << v[1]+1 << " " << v[0]-1 << " ";
+                else       outOSS << v[1]+1 << " ";
+            }
+            else{
+                for (int i = 0; i < n-4; ++i) outOSS << v[i] << " ";
+                const ul_t x = v[n-4];
+                const ul_t y = v[n-3];
+                const ul_t z = v[n-2];
+                const ul_t q = v[n-1];
+
+                if(y==1) outOSS << x+1 << " ";
+                else     outOSS << x << " " << y-1 << " 1 ";
+
+                if(z>1)  outOSS << q+1 << " " << z-1 << " ";
+                else     outOSS << q+1 << " ";
+            }
+        }
+
+        string s = outOSS.str();
+        cout << count(s.begin(), s.end(),' ') << endl;
+        cout << outOSS.str() << endl;
+    }
+    return 0;
+}
