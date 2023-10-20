@@ -1,0 +1,62 @@
+#include<stdio.h>
+#include<iostream>
+#include<algorithm>
+#include<assert.h>
+
+using namespace std;
+
+long long n,s[1001],s1[1001],ans,dp[1001];
+int m,br;
+const long long maxi=1e12;
+void ocisti()
+{
+   br=0;
+   for (int i=0;i<1001;i++)
+    dp[i]=0;
+}
+
+void solve()
+{
+    ocisti();
+    scanf("%lld%d",&n,&m);
+
+    assert(1L<=n && 1<=maxi);
+    assert(1<=m && m<=1000);
+
+    for (int i=0;i<m;i++)
+    {
+      scanf("%lld",&s[i]);
+      assert(1L<=s[i] && s[i]<=maxi);
+      if (s[i]<n && n%s[i]==0)
+      {
+          br++;
+          s1[br-1]=s[i];
+      }
+    }
+    br++;
+      s1[br-1]=n;
+
+      sort(s1,s1+br);
+
+   for (int i=0;i<br;i++)
+    for (int j=i-1;j>=0;j--)
+     if (s1[i]%s1[j]==0)
+            dp[i]=max(dp[i],(s1[i]/s1[j])*dp[j]+1);
+
+
+   printf("%lld\n",dp[br-1]);
+
+   return;
+}
+
+int main()
+{
+    int t;
+    scanf("%d",&t);
+    assert(0<t && t<=10);
+
+  while (t--)
+   solve();
+
+ return 0;
+}
