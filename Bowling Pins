@@ -1,0 +1,75 @@
+import java.io.*;
+import java.math.*;
+import java.text.*;
+import java.util.*;
+import java.util.regex.*;
+
+public class Solution {
+    static int[] grundy;
+    
+    static String isWinning(int length, String config) {
+       
+        String[] tokens = config.split("X");
+        int p = 0;
+        for(String token : tokens) {
+            p ^= grundy[token.length()];
+        }
+        return p > 0 ? "WIN" : "LOSE";
+    }
+
+    private static final Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) throws IOException {
+        BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(System.getenv("OUTPUT_PATH")));
+
+        int t = Integer.parseInt(scanner.nextLine().trim());
+
+        grundy = new int[301];
+        grundy[0] = 0; grundy[1] = 1; grundy[2] = 2;
+        
+        
+        for(int n = 3; n < grundy.length; n++) {
+            
+            List<Integer> g2 = new ArrayList<>();
+            for(int p = 1; p <= 2; p++) {
+                
+                for(int s = 0; s < ((n - p) / 2) + 1; s++) {
+                   
+                    g2.add(grundy[s]^grundy[n - p - s]);
+                }
+            }
+            int m = 0;
+            boolean found = false;
+            do {
+                found = false;
+                for(int i = 0; i < g2.size(); i++) {
+                    if(g2.get(i) == m) {
+                        found = true;
+                        m++;
+                    }
+                }
+            } while(found);
+
+            grundy[n] = m;
+        }
+
+        System.out.print("Found grundy: ");
+        for(int i = 0; i < 20; i++) {
+            System.out.print(grundy[i] + " ");
+        }
+        System.out.println();
+
+        for (int tItr = 0; tItr < t; tItr++) {
+            int n = Integer.parseInt(scanner.nextLine().trim());
+
+            String config = scanner.nextLine();
+
+            String result = isWinning(n, config);
+
+            bufferedWriter.write(result);
+            bufferedWriter.newLine();
+        }
+
+        bufferedWriter.close();
+    }
+}
