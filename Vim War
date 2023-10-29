@@ -1,0 +1,87 @@
+import java.io.*;
+import java.util.*;
+
+public class Solution {
+  private static InputReader in;
+  private static PrintWriter out;
+  public static int mod = 1000000007;
+  public static int N,M,K,s[];
+  public static long[] mult;
+
+  public static void main(String[] args) throws IOException {
+    in = new InputReader(System.in);
+    out = new PrintWriter(System.out, true);
+    
+    N = in.nextInt();
+    M = in.nextInt();
+    s = new int[N];
+    for (int i = 0; i < N; i++) s[i] = Integer.parseInt(in.next(), 2);
+    int goal = Integer.parseInt(in.next(), 2);
+    if (goal == 0) {
+      out.println(0);
+      out.close();
+      System.exit(0);
+    }
+    
+    int K = Integer.bitCount(goal);
+    mult = new long[1<<K]; Arrays.fill(mult, 1);
+    int w = ~goal;
+    for (int i = 0; i < N; i++) {
+      if ((w & s[i]) == 0) {
+        int k = 0, a = 0;
+        for (int j = 0; j < M; j++) if ((goal & (1 << j)) != 0) a |= ((s[i] >> j) & 1) << (k++);
+        mult[a] = (mult[a] << 1) % mod;
+      }
+    }
+    
+    long[] m = rec(0, (1<<K)-1);
+    long res = 0;
+    for (int i = 0; i < 1 << K; i++) {
+      long sign = (Integer.bitCount(i) & 1) == (K & 1) ? 1 : (mod-1);
+      res = (res + sign * m[i]) % mod;
+    }
+    out.println(res);
+    out.close();
+    System.exit(0);
+  }
+  
+  public static long[] rec(int from, int to) {
+    if (from == to) return new long[] {mult[from]};
+    int mid = (from+to) >> 1;
+    long[] a = rec(from, mid);
+    long[] b = rec(mid+1, to);
+    long[] ret = new long[to-from+1];
+    for (int i = 0; i < a.length; i++) {
+      ret[i] = a[i];
+      ret[i+a.length] = a[i]*b[i] % mod;
+    }
+    return ret;
+  }
+
+  static class InputReader {
+    public BufferedReader reader;
+    public StringTokenizer tokenizer;
+
+    public InputReader(InputStream stream) {
+      reader = new BufferedReader(new InputStreamReader(stream), 32768);
+      tokenizer = null;
+    }
+
+    public String next() {
+      while (tokenizer == null || !tokenizer.hasMoreTokens()) {
+        try {
+          tokenizer = new StringTokenizer(reader.readLine());
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      }
+      return tokenizer.nextToken();
+    }
+
+    public int nextInt() {
+      return Integer.parseInt(next());
+    }
+  }
+
+
+}
