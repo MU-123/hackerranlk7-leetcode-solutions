@@ -1,0 +1,33 @@
+import java.io.*;
+import java.util.*;
+import java.text.*;
+import java.math.*;
+import java.util.regex.*;
+
+public class Solution {
+
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        long[] powersOf2 = new long[64];
+        powersOf2[0] = 1;
+        for (int i = 1; i < 64; i++) {
+            powersOf2[i] = powersOf2[i - 1] << 1;
+        }
+        int q = in.nextInt();
+        for(int a0 = 0; a0 < q; a0++){
+            long x = in.nextLong();
+
+            long count = 0;
+            int position = 0;
+            while (x > 1) {
+                if ((x & 1) == 0) {
+                    count += powersOf2[position];
+                }
+                x >>= 1;
+                position++;
+            }
+            System.out.println(count);
+        }
+    }
+
+}
