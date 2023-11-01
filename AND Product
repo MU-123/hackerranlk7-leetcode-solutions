@@ -1,0 +1,24 @@
+import java.io.*;
+import java.util.*;
+
+public class Solution {
+
+    public static void main(String[] args) {
+        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution. */
+        Scanner sc = new Scanner(System.in);
+        int size = sc.nextInt();
+        for(int ii = 0; ii < size; ii++){
+            long start = sc.nextLong();
+            long end = sc.nextLong();
+            
+            long moveFactor = 1;
+        while(start != end){
+            start >>= 1;
+            end >>= 1;
+            moveFactor <<= 1;
+        }
+        System.out.println( start * moveFactor);
+       
+        }
+    }
+}
