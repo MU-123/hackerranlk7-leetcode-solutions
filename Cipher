@@ -1,0 +1,31 @@
+import java.io.*;
+import java.util.*;
+
+public class Solution {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        String[] line = scanner.nextLine().split(" ");
+        int n = Integer.valueOf(line[0]);
+        int k = Integer.valueOf(line[1]);
+        String s = scanner.nextLine();
+        
+        StringBuilder builder = new StringBuilder(n);
+        int previous = 0;
+        for(int position = 0; position<n; position++) {
+            if(position>=k) {
+                previous ^= builder.charAt(position-k)-48;
+            }
+            
+            int sgap = s.charAt(s.length()-1-position)-48;
+            if((previous^sgap)==1) {
+                builder.append('1');
+            } else {
+                builder.append('0');
+            }
+            previous = sgap;
+        }
+        
+        System.out.println(builder.reverse().toString());
+    }
+}
