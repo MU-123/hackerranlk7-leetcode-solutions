@@ -1,0 +1,36 @@
+import java.io.*;
+import java.util.*;
+
+public class Solution {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int t = sc.nextInt();
+        while(t-- > 0){
+            int n = sc.nextInt();
+            int q = 0;
+            while(n-- > 0){
+                int sum = getPrimeFactor(sc.nextInt(), 0);
+                q = q^sum;
+            }
+            if(q==0){System.out.println("2");}
+            else{System.out.println("1");}
+        }
+    }
+    
+    public static int getPrimeFactor(int num, int sum){
+        while(num%2==0){
+            sum = sum+1;
+            num = num/2;
+        }
+        for(int i=3;i<=Math.sqrt(num); i=i+2){
+            while(num%i==0){
+                sum = sum +1;
+                num = num/i;
+            }
+        }
+        if(num>2)
+            sum++;
+        return sum;
+    }
+}
